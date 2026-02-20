@@ -1,39 +1,75 @@
 # Compass 🧭
 
-Zero-config OpenAPI documentation generator for Laravel modular applications.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/sdekkers/compass.svg?style=flat-square)](https://packagist.org/packages/sdekkers/compass)
+[![PHP Version](https://img.shields.io/packagist/php-v/sdekkers/compass.svg?style=flat-square)](https://packagist.org/packages/sdekkers/compass)
+[![License](https://img.shields.io/packagist/l/sdekkers/compass.svg?style=flat-square)](LICENSE)
 
-No annotations. No docblocks. Just reads your code.
+**Zero-config OpenAPI documentation for Laravel.** No annotations. No docblocks. Just reads your code.
 
-## Install
+## Features
+
+- 🔍 Automatic OpenAPI 3.0 spec generation from Laravel routes
+- 📋 Schema extraction from FormRequest validation rules
+- 📦 Response schemas from JsonResource classes
+- 🔐 Auth detection from middleware (Passport, Sanctum, Bearer)
+- 🏷️ Module-based route grouping via controller namespaces
+- 🖥️ Built-in Swagger UI at `/docs`
+- 📄 YAML and JSON output
+
+## Requirements
+
+- PHP 8.4+
+- Laravel 11 or 12
+
+## Installation
 
 ```bash
 composer require sdekkers/compass
 ```
 
-## Generate
+## Quick Start
 
 ```bash
 php artisan compass:generate
 ```
 
-That's it. Your `openapi.yaml` and `openapi.json` are in `storage/app/compass/`.
+Your `openapi.yaml` and `openapi.json` are now in `storage/app/compass/`. Visit `/docs` to see the Swagger UI.
 
-## Swagger UI
+## Configuration
 
-Visit `/docs` in your browser. Enabled by default.
+Publish the config file:
 
-## What It Reads
+```bash
+php artisan vendor:publish --tag=compass-config
+```
 
-- **Routes** — method, URI, middleware, controller from Laravel's router
-- **Request validation** — FormRequest `rules()` → OpenAPI schemas
-- **Response schemas** — JsonResource `toArray()` keys
-- **Auth middleware** — Passport, Sanctum, Bearer → security schemes
-- **Module grouping** — `App\Modules\{Name}\Controllers\{Sub}\Controller` → tagged groups
+Key options in `config/compass.php`:
 
-## Laravel Validation → OpenAPI
+| Option | Description |
+|--------|-------------|
+| `title` | API documentation title |
+| `version` | API version string |
+| `servers` | Server URLs for the spec |
+| `routes.prefixes` | Route prefixes to include (default: `['api']`) |
+| `routes.exclude_patterns` | Glob patterns to exclude |
+| `grouping.enabled` | Auto-group by module namespace |
+| `ui.enabled` | Enable/disable Swagger UI |
+| `ui.path` | URL path for Swagger UI (default: `docs`) |
 
-| Rule | OpenAPI |
-|------|---------|
+## How It Works
+
+Compass inspects your Laravel application and extracts:
+
+- **Routes** — HTTP method, URI, parameters, and middleware from the router
+- **Request validation** — FormRequest `rules()` are mapped to OpenAPI request body schemas
+- **Response schemas** — JsonResource `toArray()` keys become response schemas
+- **Authentication** — Middleware like `auth:api` and `auth:sanctum` map to security schemes
+- **Grouping** — Controllers in `App\Modules\{Name}\Controllers\` are automatically tagged
+
+### Validation Rule Mapping
+
+| Laravel Rule | OpenAPI |
+|-------------|---------|
 | `string` | `{type: "string"}` |
 | `integer` | `{type: "integer"}` |
 | `boolean` | `{type: "boolean"}` |
@@ -45,19 +81,10 @@ Visit `/docs` in your browser. Enabled by default.
 | `in:a,b,c` | `{enum: ["a","b","c"]}` |
 | `nullable` | `{nullable: true}` |
 
-## Config
+## Contributing
 
-```bash
-php artisan vendor:publish --tag=compass-config
-```
-
-See `config/compass.php` for all options: title, version, servers, route filtering, grouping overrides, Swagger UI settings.
-
-## Requirements
-
-- PHP 8.4+
-- Laravel 11 or 12
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
-MIT
+The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
