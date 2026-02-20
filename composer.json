@@ -3,6 +3,14 @@
     "description": "Zero-config OpenAPI documentation generator for Laravel modular applications",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Sander Dekkers",
+            "email": "sander@dekkers.dev"
+        }
+    ],
+    "homepage": "https://github.com/SDekkers/Compass",
+    "keywords": ["laravel", "openapi", "swagger", "documentation", "api"],
     "require": {
         "php": "^8.4",
         "illuminate/support": "^11.0|^12.0",
