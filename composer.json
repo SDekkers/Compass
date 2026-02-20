@@ -2,7 +2,7 @@
     "name": "sdekkers/compass",
     "description": "Zero-config OpenAPI documentation generator for Laravel modular applications",
     "type": "library",
-    "license": "MIT",
+    "license": "ISC",
     "authors": [
         {
             "name": "Sander Dekkers",
