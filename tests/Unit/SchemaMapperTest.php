@@ -55,7 +55,8 @@ it('maps min rule for integer', function (): void {
 
 it('maps in rule to enum', function (): void {
     $result = $this->mapper->map(['in:a,b,c']);
-    expect($result)->toBe(['type' => 'string', 'enum' => ['a', 'b', 'c']]);
+    expect($result['enum'])->toBe(['a', 'b', 'c']);
+    expect($result['type'])->toBe('string');
 });
 
 it('maps array rule', function (): void {

@@ -68,12 +68,12 @@ final class RouteExtractor
             return 'General';
         }
 
-        // Match App\Modules\{Group}\Controllers\{Subgroup}\Controller
-        if (preg_match('/Modules\\\\([^\\\\]+)\\\\.*?Controllers\\\\([^\\\\]+)/', $controller, $matches)) {
+        // Match App\Modules\{Group}\Controllers\{Subgroup}\Controller (subgroup is not a controller class)
+        if (preg_match('/Modules\\\\([^\\\\]+)\\\\.*?Controllers\\\\([^\\\\]+)\\\\/', $controller, $matches)) {
             return $matches[1] . ' > ' . $matches[2];
         }
 
-        // Match App\Modules\{Group}\Controllers\Controller
+        // Match App\Modules\{Group}\...
         if (preg_match('/Modules\\\\([^\\\\]+)\\\\/', $controller, $matches)) {
             return $matches[1];
         }
