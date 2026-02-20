@@ -20,7 +20,7 @@ final class MiddlewareExtractor
                         'flows' => [
                             'clientCredentials' => [
                                 'tokenUrl' => '/oauth/token',
-                                'scopes' => new \stdClass(),
+                                'scopes' => new \ArrayObject(),
                             ],
                         ],
                     ];
