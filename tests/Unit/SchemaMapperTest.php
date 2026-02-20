@@ -40,7 +40,7 @@ it('maps date rule', function (): void {
 
 it('maps nullable rule', function (): void {
     $result = $this->mapper->map(['string', 'nullable']);
-    expect($result)->toBe(['type' => 'string', 'nullable' => true]);
+    expect($result)->toBe(['type' => ['string', 'null']]);
 });
 
 it('maps max rule for string', function (): void {
@@ -71,7 +71,7 @@ it('maps between rule for string', function (): void {
 
 it('maps combined rules', function (): void {
     $result = $this->mapper->map(['string', 'max:255', 'nullable']);
-    expect($result)->toBe(['type' => 'string', 'maxLength' => 255, 'nullable' => true]);
+    expect($result)->toBe(['type' => ['string', 'null'], 'maxLength' => 255]);
 });
 
 it('defaults to string when no type rule given', function (): void {

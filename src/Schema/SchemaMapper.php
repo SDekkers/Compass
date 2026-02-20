@@ -31,7 +31,7 @@ final class SchemaMapper
                 $rule === 'ip', $rule === 'ipv4' => $schema = array_merge($schema, ['type' => 'string', 'format' => 'ipv4']),
                 $rule === 'ipv6' => $schema = array_merge($schema, ['type' => 'string', 'format' => 'ipv6']),
                 $rule === 'json' => $schema = array_merge($schema, ['type' => 'string', 'format' => 'json']),
-                $rule === 'nullable' => $schema['nullable'] = true,
+                $rule === 'nullable' => $schema['_nullable'] = true,
                 $rule === 'file', $rule === 'image' => $schema = array_merge($schema, ['type' => 'string', 'format' => 'binary']),
                 str_starts_with($rule, 'max:') => $this->applyMax($schema, $rule),
                 str_starts_with($rule, 'min:') => $this->applyMin($schema, $rule),
@@ -44,6 +44,11 @@ final class SchemaMapper
 
         if (! isset($schema['type'])) {
             $schema['type'] = 'string';
+        }
+
+        if (isset($schema['_nullable'])) {
+            unset($schema['_nullable']);
+            $schema['type'] = [$schema['type'], 'null'];
         }
 
         return $schema;
