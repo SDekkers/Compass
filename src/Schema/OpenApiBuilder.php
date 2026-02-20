@@ -70,14 +70,28 @@ final class OpenApiBuilder
             $this->tags[] = $group;
         }
 
+        // Ensure response status codes are strings (OpenAPI 3.1 requirement)
+        // and add content type to responses
+        $stringResponses = [];
+        foreach ($responses as $code => $response) {
+            if (! isset($response['content'])) {
+                $response['content'] = [
+                    'application/json' => [
+                        'schema' => ['type' => 'object'],
+                    ],
+                ];
+            }
+            $stringResponses[(string) $code] = $response;
+        }
+
         $operation = [
             'tags' => [$group],
-            'responses' => $responses,
+            'responses' => $stringResponses,
         ];
 
         if ($summary !== '') {
             $operation['summary'] = $summary;
-            $operation['operationId'] = $summary;
+            $operation['operationId'] = $method . '.' . $summary;
         }
 
         if ($allParameters !== []) {
