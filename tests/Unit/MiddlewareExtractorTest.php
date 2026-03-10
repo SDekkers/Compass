@@ -110,3 +110,39 @@ it('includes scopes in route security for passport routes with scope middleware'
 
     expect($security)->toBe([['oauth2' => ['read-alerts']]]);
 });
+
+it('extracts client.action middleware as scopes', function (): void {
+    $route = ['middleware' => ['auth:api', 'client.action:cyberguard.read']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['scopes'])->toBe(['cyberguard.read']);
+    expect($result['permissions'])->toBe([]);
+    expect($result['licenses'])->toBe([]);
+});
+
+it('extracts multiple client.action values as scopes', function (): void {
+    $route = ['middleware' => ['auth:api', 'client.action:eset.read', 'client.action:cyberguard.write']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['scopes'])->toBe(['eset.read', 'cyberguard.write']);
+});
+
+it('includes client.action scopes in security schemes', function (): void {
+    $routes = [
+        ['middleware' => ['auth:api', 'client.action:core.tenants.read']],
+        ['middleware' => ['auth:api', 'client.action:easm.write']],
+    ];
+    $schemes = $this->extractor->extractSecuritySchemes($routes);
+
+    expect($schemes)->toHaveKey('oauth2');
+    $scopes = $schemes['oauth2']['flows']['clientCredentials']['scopes'];
+    expect(isset($scopes['core.tenants.read']))->toBeTrue();
+    expect(isset($scopes['easm.write']))->toBeTrue();
+});
+
+it('includes client.action in route security for passport routes', function (): void {
+    $route = ['middleware' => ['auth:api', 'client.action:pm.read']];
+    $security = $this->extractor->extractRouteSecurity($route);
+
+    expect($security)->toBe([['oauth2' => ['pm.read']]]);
+});

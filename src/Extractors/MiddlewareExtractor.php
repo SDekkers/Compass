@@ -133,18 +133,21 @@ final class MiddlewareExtractor
 
     private function parseScopesFromMiddleware(string $middleware): array
     {
-        if (str_starts_with($middleware, 'scope:') || str_starts_with($middleware, 'scopes:')) {
-            $colonPos = strpos($middleware, ':');
-            $value = substr($middleware, $colonPos + 1);
-            $scopes = [];
-            foreach (explode(',', $value) as $scope) {
-                $scope = trim($scope);
-                if ($scope !== '') {
-                    $scopes[] = $scope;
-                }
-            }
+        $prefixes = ['scope:', 'scopes:', 'client.action:'];
 
-            return $scopes;
+        foreach ($prefixes as $prefix) {
+            if (str_starts_with($middleware, $prefix)) {
+                $value = substr($middleware, strlen($prefix));
+                $scopes = [];
+                foreach (explode(',', $value) as $scope) {
+                    $scope = trim($scope);
+                    if ($scope !== '') {
+                        $scopes[] = $scope;
+                    }
+                }
+
+                return $scopes;
+            }
         }
 
         return [];
