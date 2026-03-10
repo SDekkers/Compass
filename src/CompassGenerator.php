@@ -58,6 +58,7 @@ final class CompassGenerator
             }
 
             $security = $this->middlewareExtractor->extractRouteSecurity($route);
+            $routePermissions = $this->middlewareExtractor->extractRoutePermissions($route);
 
             $this->builder->addPath(
                 path: $route['uri'],
@@ -68,6 +69,9 @@ final class CompassGenerator
                 requestBody: $requestBody,
                 responses: $responses,
                 security: $security,
+                permissions: $routePermissions['permissions'],
+                licenses: $routePermissions['licenses'],
+                scopes: $routePermissions['scopes'],
             );
         }
 
