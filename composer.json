@@ -10,6 +10,7 @@
         }
     ],
     "homepage": "https://github.com/SDekkers/Compass",
+    "version": "0.1.3",
     "keywords": ["laravel", "openapi", "swagger", "documentation", "api"],
     "require": {
         "php": "^8.4",

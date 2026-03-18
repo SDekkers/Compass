@@ -136,3 +136,78 @@ it('adds security schemes', function (): void {
 
     expect($spec['components']['securitySchemes'])->toHaveKey('bearerAuth');
 });
+
+it('adds x-required-permission as string for single permission', function (): void {
+    $this->builder->addPath(
+        path: '/api/users',
+        method: 'get',
+        summary: 'List users',
+        group: 'Users',
+        responses: ['200' => ['description' => 'OK']],
+        security: [['bearerAuth' => []]],
+        permissions: ['core.user.view'],
+    );
+
+    $spec = $this->builder->build();
+
+    expect($spec['paths']['/api/users']['get']['x-required-permission'])->toBe('core.user.view');
+});
+
+it('adds x-required-permission as array for multiple permissions', function (): void {
+    $this->builder->addPath(
+        path: '/api/users',
+        method: 'get',
+        summary: 'List users',
+        group: 'Users',
+        responses: ['200' => ['description' => 'OK']],
+        security: [['bearerAuth' => []]],
+        permissions: ['core.user.view', 'core.user.manage'],
+    );
+
+    $spec = $this->builder->build();
+
+    expect($spec['paths']['/api/users']['get']['x-required-permission'])->toBe(['core.user.view', 'core.user.manage']);
+});
+
+it('omits x-required-permission when no permissions', function (): void {
+    $this->builder->addPath(
+        path: '/api/users',
+        method: 'get',
+        summary: 'List users',
+        group: 'Users',
+        responses: ['200' => ['description' => 'OK']],
+    );
+
+    $spec = $this->builder->build();
+
+    expect($spec['paths']['/api/users']['get'])->not->toHaveKey('x-required-permission');
+});
+
+it('adds x-middleware for custom middleware', function (): void {
+    $this->builder->addPath(
+        path: '/api/users',
+        method: 'get',
+        summary: 'List users',
+        group: 'Users',
+        responses: ['200' => ['description' => 'OK']],
+        middleware: ['tenant.access', 'resolve.sites'],
+    );
+
+    $spec = $this->builder->build();
+
+    expect($spec['paths']['/api/users']['get']['x-middleware'])->toBe(['tenant.access', 'resolve.sites']);
+});
+
+it('omits x-middleware when no custom middleware', function (): void {
+    $this->builder->addPath(
+        path: '/api/users',
+        method: 'get',
+        summary: 'List users',
+        group: 'Users',
+        responses: ['200' => ['description' => 'OK']],
+    );
+
+    $spec = $this->builder->build();
+
+    expect($spec['paths']['/api/users']['get'])->not->toHaveKey('x-middleware');
+});

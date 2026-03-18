@@ -92,6 +92,7 @@ final class MiddlewareExtractor
         $permissions = [];
         $licenses = [];
         $scopes = [];
+        $customMiddleware = [];
 
         foreach ($middleware as $mw) {
             if (str_starts_with($mw, 'permission:')) {
@@ -110,6 +111,8 @@ final class MiddlewareExtractor
                         $licenses[] = $license;
                     }
                 }
+            } elseif ($this->isCustomMiddleware($mw)) {
+                $customMiddleware[] = $mw;
             } else {
                 foreach ($this->parseScopesFromMiddleware($mw) as $scope) {
                     $scopes[] = $scope;
@@ -121,6 +124,7 @@ final class MiddlewareExtractor
             'permissions' => $permissions,
             'licenses' => $licenses,
             'scopes' => $scopes,
+            'middleware' => $customMiddleware,
         ];
     }
 
@@ -171,5 +175,30 @@ final class MiddlewareExtractor
     {
         return $middleware === 'auth'
             || $middleware === 'auth:bearer';
+    }
+
+    private function isCustomMiddleware(string $middleware): bool
+    {
+        // Skip framework / well-known middleware — everything else is custom
+        $ignoredPrefixes = ['auth', 'throttle', 'permission:', 'license.access:', 'scope:', 'scopes:', 'client.action:', 'bindings', 'can:', 'verified', 'signed', 'cache.headers:', 'precognitive'];
+
+        foreach ($ignoredPrefixes as $prefix) {
+            if (str_starts_with($middleware, $prefix)) {
+                return false;
+            }
+        }
+
+        // Also skip bare framework middleware class names
+        if (str_contains($middleware, 'Illuminate\\') || str_contains($middleware, 'Laravel\\')) {
+            return false;
+        }
+
+        // Skip common single-word framework middleware
+        $ignoredExact = ['api', 'web', 'guest', 'password.confirm', 'SubstituteBindings'];
+        if (in_array($middleware, $ignoredExact, true)) {
+            return false;
+        }
+
+        return true;
     }
 }

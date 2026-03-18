@@ -45,6 +45,7 @@ it('extracts permission from permission middleware', function (): void {
     expect($result['permissions'])->toBe(['edr.access.access']);
     expect($result['licenses'])->toBe([]);
     expect($result['scopes'])->toBe([]);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('extracts license from license.access middleware', function (): void {
@@ -54,6 +55,7 @@ it('extracts license from license.access middleware', function (): void {
     expect($result['permissions'])->toBe([]);
     expect($result['licenses'])->toBe(['edr']);
     expect($result['scopes'])->toBe([]);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('extracts scope from scope middleware', function (): void {
@@ -63,6 +65,7 @@ it('extracts scope from scope middleware', function (): void {
     expect($result['permissions'])->toBe([]);
     expect($result['licenses'])->toBe([]);
     expect($result['scopes'])->toBe(['read-alerts']);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('extracts scopes from scopes middleware with multiple values', function (): void {
@@ -93,6 +96,7 @@ it('extracts all permission types from multiple middleware', function (): void {
     expect($result['permissions'])->toBe(['edr.access.access']);
     expect($result['licenses'])->toBe(['edr']);
     expect($result['scopes'])->toBe(['read-alerts']);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('returns empty arrays when no permission or scope middleware present', function (): void {
@@ -102,6 +106,7 @@ it('returns empty arrays when no permission or scope middleware present', functi
     expect($result['permissions'])->toBe([]);
     expect($result['licenses'])->toBe([]);
     expect($result['scopes'])->toBe([]);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('includes scopes in route security for passport routes with scope middleware', function (): void {
@@ -118,6 +123,7 @@ it('extracts client.action middleware as scopes', function (): void {
     expect($result['scopes'])->toBe(['cyberguard.read']);
     expect($result['permissions'])->toBe([]);
     expect($result['licenses'])->toBe([]);
+    expect($result['middleware'])->toBe([]);
 });
 
 it('extracts multiple client.action values as scopes', function (): void {
@@ -145,4 +151,40 @@ it('includes client.action in route security for passport routes', function (): 
     $security = $this->extractor->extractRouteSecurity($route);
 
     expect($security)->toBe([['oauth2' => ['pm.read']]]);
+});
+
+it('extracts multiple stacked permissions', function (): void {
+    $route = ['middleware' => ['auth:sanctum', 'permission:core.user.view', 'permission:core.user.manage']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['permissions'])->toBe(['core.user.view', 'core.user.manage']);
+});
+
+it('extracts comma-separated permissions from single middleware', function (): void {
+    $route = ['middleware' => ['permission:core.user.view,core.user.manage']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['permissions'])->toBe(['core.user.view', 'core.user.manage']);
+});
+
+it('extracts custom middleware like tenant.access', function (): void {
+    $route = ['middleware' => ['auth:sanctum', 'tenant.access', 'resolve.sites']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['middleware'])->toBe(['tenant.access', 'resolve.sites']);
+    expect($result['permissions'])->toBe([]);
+});
+
+it('does not include framework middleware as custom', function (): void {
+    $route = ['middleware' => ['auth:sanctum', 'throttle:60,1', 'bindings', 'can:viewAny']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['middleware'])->toBe([]);
+});
+
+it('route without permission has no x-required-permission extension', function (): void {
+    $route = ['middleware' => ['auth:sanctum']];
+    $result = $this->extractor->extractRoutePermissions($route);
+
+    expect($result['permissions'])->toBe([]);
 });

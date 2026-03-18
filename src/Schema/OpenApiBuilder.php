@@ -49,6 +49,7 @@ final class OpenApiBuilder
         array $permissions = [],
         array $licenses = [],
         array $scopes = [],
+        array $middleware = [],
     ): void {
         // Convert Laravel route params to OpenAPI path params
         $openApiPath = preg_replace('/\{(\w+)\??}/', '{$1}', $path);
@@ -110,11 +111,15 @@ final class OpenApiBuilder
         }
 
         if ($permissions !== []) {
-            $operation['x-permissions'] = $permissions;
+            $operation['x-required-permission'] = count($permissions) === 1 ? $permissions[0] : $permissions;
         }
 
         if ($licenses !== []) {
             $operation['x-license-required'] = $licenses;
+        }
+
+        if ($middleware !== []) {
+            $operation['x-middleware'] = $middleware;
         }
 
         $this->spec['paths'][$openApiPath][$method] = $operation;

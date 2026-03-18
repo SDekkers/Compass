@@ -72,6 +72,7 @@ final class CompassGenerator
                 permissions: $routePermissions['permissions'],
                 licenses: $routePermissions['licenses'],
                 scopes: $routePermissions['scopes'],
+                middleware: $routePermissions['middleware'],
             );
         }
 
